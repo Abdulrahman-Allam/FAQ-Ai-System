@@ -110,8 +110,10 @@ model.save(os.path.join(training_args.output_dir, f"last-checkpoint"))
 if training_args.save_last_checkpoint_to_drive:
     save_model_to_drive(training_args)
 else:
-    dev_infer_df = infer_relevance(model, dev_infer_data, tok_k_relevant=data_args.tok_k_relevant)
+  if training_args.do_eval:
+      dev_infer_df = infer_relevance(model, dev_infer_data, tok_k_relevant=data_args.tok_k_relevant)
+      dev_infer_df.to_csv(os.path.join(training_args.my_output_dir, "eval_inference.tsv"), sep="\t", index=False, header=False)
+  if training_args.do_predict:
     test_infer_df = infer_relevance(model, test_infer_data, tok_k_relevant=data_args.tok_k_relevant)
-    dev_infer_df.to_csv(os.path.join(training_args.my_output_dir, "eval_inference.tsv"), sep="\t", index=False, header=False)
     test_infer_df.to_csv(os.path.join(training_args.my_output_dir, "test_inference.tsv"), sep="\t", index=False, header=False)
-    zip_inference_data(training_args, data_args)
+  zip_inference_data(training_args, data_args)
